@@ -1,4 +1,4 @@
-### Hi 👋, I'm duongoku
+### Hi 👋, I'm Duong(pronounced "Zuong").
 
 ----
 
