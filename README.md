@@ -1,4 +1,4 @@
-### Hi 👋, I'm Duong(pronounced "Zuong").
+### Hi 👋, I'm Duong (pronounced "Zuong").
 
 ----
 
