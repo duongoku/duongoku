@@ -2,7 +2,7 @@
 
 ----
 
-A person who enjoys writing programs
+I'm a person who enjoys writing useful programs.
 
 ----
 
