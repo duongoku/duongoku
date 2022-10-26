@@ -2,7 +2,7 @@
 
 ----
 
-I'm a person who enjoys writing useful programs.
+I enjoy writing useful applications for people around me and others too.
 
 ----
 
