@@ -37,4 +37,4 @@ jobs:
           plugin_habits_languages_threshold: 0%
           plugin_isocalendar: yes
           plugin_isocalendar_duration: half-year
-          config_padding: 20
+          config_padding: 40
