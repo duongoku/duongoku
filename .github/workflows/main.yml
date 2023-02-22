@@ -25,15 +25,16 @@ jobs:
           token: ${{ secrets.METRICS_TOKEN }}
 
           # Options
-          user: duongoku
           template: classic
           base: header, activity, community, repositories, metadata
           config_timezone: Asia/Ho_Chi_Minh
           plugin_habits: yes
-          plugin_habits_charts_type: chartist
+          plugin_habits_charts_type: classic
           plugin_habits_days: 14
           plugin_habits_facts: yes
           plugin_habits_from: 200
           plugin_habits_languages_limit: 8
           plugin_habits_languages_threshold: 0%
+          plugin_isocalendar: yes
+          plugin_isocalendar_duration: half-year
           config_padding: 20
