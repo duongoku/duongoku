@@ -36,4 +36,4 @@ jobs:
           plugin_habits_from: 200
           plugin_habits_languages_limit: 8
           plugin_habits_languages_threshold: 0%
-          config_padding: 20%
+          config_padding: 20
