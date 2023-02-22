@@ -26,7 +26,7 @@ jobs:
 
           # Options
           config_padding: 30%
-          markdown: classic
+          template: markdown
           base: header, activity, community, repositories, metadata
           config_timezone: Asia/Ho_Chi_Minh
           plugin_habits: yes
