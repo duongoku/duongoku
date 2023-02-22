@@ -2,7 +2,7 @@
 
 ----
 
-I enjoy writing useful applications for people around me and others too.
+I enjoy writing useful applications for people.
 
 ----
 
