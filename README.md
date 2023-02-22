@@ -2,7 +2,7 @@
 
 ----
 
-I enjoy writing useful applications for people.
+I actually don't know what to write here.
 
 ----
 
