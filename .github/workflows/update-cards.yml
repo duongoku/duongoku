@@ -1,0 +1,97 @@
+name: Update README cards
+
+on:
+    schedule:
+        - cron: '0 0 * * *' # Runs once daily at midnight
+    workflow_dispatch:
+
+permissions:
+    contents: write
+
+jobs:
+    build:
+        runs-on: ubuntu-latest
+
+        steps:
+            - uses: actions/checkout@v6
+
+            - name: Generate stats card
+              env:
+                  GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+                  OWNER: ${{ github.repository_owner }}
+              run: |
+                  set -euo pipefail
+                  export LC_ALL=C
+                  mkdir -p profile
+
+                  user=$(gh api "users/$OWNER")
+                  repos=$(gh api --paginate "users/$OWNER/repos?per_page=100")
+
+                  total_repos=$(jq -r '.public_repos' <<<"$user")
+                  followers=$(jq -r '.followers' <<<"$user")
+                  stars=$(jq -r '[.[].stargazers_count] | add // 0' <<<"$repos")
+                  forks=$(jq -r '[.[].forks_count] | add // 0' <<<"$repos")
+
+                  # Language totals across owned repos (skip forks)
+                  gh api --paginate "users/$OWNER/repos?per_page=100" \
+                      | jq -r '.[] | select(.fork == false) | .languages_url' \
+                      | while read -r url; do
+                          gh api "$url" | jq -r 'to_entries[] | "\(.key) \(.value)"'
+                      done | awk '{ langs[$1] += $2 } END { for (l in langs) print langs[l], l }' \
+                      | sort -rn > /tmp/langs.txt
+
+                  total_bytes=$(awk '{ s += $1 } END { print s }' /tmp/langs.txt)
+
+                  # --- Stats card ---
+                  {
+                      cat <<'EOF'
+                  <svg width="480" height="195" viewBox="0 0 480 195" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <style>
+                  .title { font: 600 18px 'Segoe UI', Ubuntu, Sans-Serif; fill: #2f80ed }
+                  .stat { font: 600 14px 'Segoe UI', Ubuntu, Sans-Serif; fill: #434d58 }
+                  </style>
+                  <rect x="0.5" y="0.5" width="479" height="194" rx="4.5" fill="#fffefe" stroke="#e4e2e2"/>
+                  <text x="25" y="35" class="title">GitHub Stats</text>
+                  EOF
+                      y=70
+                      for pair in "Public Repos: $total_repos" "Total Stars: $stars" "Total Forks: $forks" "Followers: $followers"; do
+                          label=${pair%%: *}
+                          value=${pair#*: }
+                          printf '  <text x="25" y="%d" class="stat">%s: %s</text>\n' "$y" "$label" "$value"
+                          y=$((y + 30))
+                      done
+                      echo '</svg>'
+                  } > profile/stats.svg
+
+                  # --- Top languages card ---
+                  {
+                      cat <<'EOF'
+                  <svg width="480" height="320" viewBox="0 0 480 320" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <style>
+                  .title { font: 600 18px 'Segoe UI', Ubuntu, Sans-Serif; fill: #2f80ed }
+                  .lang { font: 600 12px 'Segoe UI', Ubuntu, Sans-Serif; fill: #434d58 }
+                  .pct { font: 600 12px 'Segoe UI', Ubuntu, Sans-Serif; fill: #858585 }
+                  </style>
+                  <rect x="0.5" y="0.5" width="479" height="319" rx="4.5" fill="#fffefe" stroke="#e4e2e2"/>
+                  <text x="25" y="35" class="title">Top Languages</text>
+                  EOF
+                      y=70
+                      head -n 6 /tmp/langs.txt | while read -r bytes lang; do
+                          [ -n "$lang" ] || continue
+                          pct=$(awk -v b="$bytes" -v t="$total_bytes" 'BEGIN { printf "%.1f", (t > 0 ? 100 * b / t : 0) }')
+                          w=$(awk -v p="$pct" 'BEGIN { printf "%d", 430 * p / 100 }')
+                          printf '  <text x="25" y="%d" class="lang">%s</text>\n' "$y" "$lang"
+                          printf '  <rect x="25" y="%d" width="430" height="8" rx="4" fill="#e4e2e2"/>\n' "$((y + 8))"
+                          printf '  <rect x="25" y="%d" width="%d" height="8" rx="4" fill="#2f80ed"/>\n' "$((y + 8))" "$w"
+                          printf '  <text x="455" y="%d" text-anchor="end" class="pct">%s%%</text>\n' "$y" "$pct"
+                          y=$((y + 40))
+                      done
+                      echo '</svg>'
+                  } > profile/top-langs.svg
+
+            - name: Commit cards
+              run: |
+                  git config user.name "github-actions[bot]"
+                  git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+                  git add profile/*.svg
+                  git diff --cached --quiet || (git commit -m "Update README cards" && git push)
