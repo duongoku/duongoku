@@ -92,6 +92,98 @@ jobs:
                       echo '</svg>'
                   } > profile/top-langs.svg
 
+                  # --- Pokédex card ---
+                  # Avatar: embed as base64 data URI (GitHub README <img> blocks external refs).
+                  AVATAR_LINE=''
+                  if curl -sL --fail "https://github.com/$OWNER.png?size=96" -o /tmp/avatar.png && [ -s /tmp/avatar.png ]; then
+                      avatar_b64=$(base64 -w0 /tmp/avatar.png)
+                      AVATAR_LINE=$(printf '<image href="data:image/png;base64,%s" x="88" y="106" width="68" height="68" clip-path="url(#avclip)" preserveAspectRatio="xMidYMid slice"/>' "$avatar_b64")
+                  fi
+                  # Fallback: colored circle with initial (workflow still succeeds if avatar fetch fails)
+                  if [ -z "$AVATAR_LINE" ]; then
+                      AVATAR_LINE='<circle cx="122" cy="140" r="34" fill="#2f80ed"/><text x="122" y="151" text-anchor="middle" class="fallback-initial">D</text>'
+                  fi
+
+                  {
+                      cat <<EOF
+                  <svg width="480" height="360" viewBox="0 0 480 360" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <style>
+                  .title { font: 600 18px 'Segoe UI', Ubuntu, Sans-Serif; fill: #2f80ed }
+                  .name { font: 600 22px 'Segoe UI', Ubuntu, Sans-Serif; fill: #434d58 }
+                  .handle { font: 500 13px 'Segoe UI', Ubuntu, Sans-Serif; fill: #858585 }
+                  .cp { font: 700 14px 'Segoe UI', Ubuntu, Sans-Serif; fill: #ffffff }
+                  .statlabel { font: 600 11px 'Segoe UI', Ubuntu, Sans-Serif; fill: #858585; letter-spacing: 1px }
+                  .statval { font: 700 16px 'Segoe UI', Ubuntu, Sans-Serif; fill: #434d58 }
+                  .fallback-initial { font: 700 30px 'Segoe UI', Ubuntu, Sans-Serif; fill: #ffffff }
+                  </style>
+                  <defs>
+                  <clipPath id="avclip"><circle cx="122" cy="140" r="34"/></clipPath>
+                  </defs>
+                  <rect x="0.5" y="0.5" width="479" height="359" rx="4.5" fill="#fffefe" stroke="#e4e2e2"/>
+                  <text x="25" y="35" class="title">Pokédex</text>
+
+                  <!-- Trainer card (slides up out of the ball) -->
+                  <g opacity="0">
+                      <animate attributeName="opacity" values="0;0;1;1;0;0" keyTimes="0;0.36;0.44;0.86;0.92;1" dur="8s" repeatCount="indefinite"/>
+                      <animateTransform attributeName="transform" type="translate" values="0 140;0 140;0 -8;0 0;0 0;0 140" keyTimes="0;0.36;0.46;0.5;0.88;0.95" dur="8s" repeatCount="indefinite"/>
+                      <rect x="70.5" y="70.5" width="335" height="139" rx="11" fill="#ffffff" stroke="#e4e2e2"/>
+                      <circle cx="122" cy="140" r="38" fill="#ffffff" stroke="#e4e2e2" stroke-width="2"/>
+                      $AVATAR_LINE
+                      <text x="178" y="126" class="name">Duong</text>
+                      <text x="178" y="148" class="handle">@duongoku</text>
+                      <rect x="178" y="158" width="104" height="26" rx="13" fill="#2f80ed"/>
+                      <text x="230" y="176" text-anchor="middle" class="cp">CP ★ $stars</text>
+                      <text x="316" y="112" class="statlabel">REPOS</text>
+                      <text x="392" y="112" text-anchor="end" class="statval">$total_repos</text>
+                      <text x="316" y="140" class="statlabel">FOLLOWERS</text>
+                      <text x="392" y="140" text-anchor="end" class="statval">$followers</text>
+                      <text x="316" y="168" class="statlabel">FORKS</text>
+                      <text x="392" y="168" text-anchor="end" class="statval">$forks</text>
+                  </g>
+
+                  <!-- Sparkles on reveal -->
+                  <g fill="#2f80ed">
+                      <rect x="292" y="212" width="9" height="9" transform="rotate(45 296.5 216.5)" opacity="0">
+                          <animate attributeName="opacity" values="0;0;1;0;0" keyTimes="0;0.36;0.42;0.55;1" dur="8s" repeatCount="indefinite"/>
+                      </rect>
+                      <rect x="176" y="222" width="7" height="7" transform="rotate(45 179.5 225.5)" opacity="0">
+                          <animate attributeName="opacity" values="0;0;1;0;0" keyTimes="0;0.38;0.44;0.57;1" dur="8s" repeatCount="indefinite"/>
+                      </rect>
+                      <rect x="306" y="286" width="8" height="8" transform="rotate(45 310 290)" opacity="0">
+                          <animate attributeName="opacity" values="0;0;1;0;0" keyTimes="0;0.40;0.46;0.59;1" dur="8s" repeatCount="indefinite"/>
+                      </rect>
+                  </g>
+
+                  <!-- Reveal flash -->
+                  <circle cx="240" cy="264" r="0" fill="#ffffff">
+                      <animate attributeName="r" values="0;0;64;64" keyTimes="0;0.31;0.40;1" dur="8s" repeatCount="indefinite"/>
+                      <animate attributeName="opacity" values="0;0;0.85;0;0" keyTimes="0;0.31;0.35;0.42;1" dur="8s" repeatCount="indefinite"/>
+                  </circle>
+
+                  <!-- Pokéball -->
+                  <g>
+                      <animateTransform attributeName="transform" type="rotate" values="0 240 264;-16 240 264;14 240 264;-12 240 264;10 240 264;-4 240 264;0 240 264;0 240 264" keyTimes="0;0.05;0.10;0.15;0.20;0.26;0.30;1" dur="8s" repeatCount="indefinite"/>
+                      <ellipse cx="240" cy="322" rx="42" ry="6" fill="#434d58" opacity="0.08"/>
+                      <!-- top half (flips open on hinge at left edge) -->
+                      <g>
+                          <animateTransform attributeName="transform" type="rotate" values="0 192 264;0 192 264;-135 192 264;-135 192 264;0 192 264" keyTimes="0;0.30;0.36;0.92;1" dur="8s" repeatCount="indefinite"/>
+                          <path d="M 192 264 A 48 48 0 0 1 288 264 Z" fill="#ee4035"/>
+                          <path d="M 196 236 A 48 48 0 0 1 284 236 L 276 251 A 30 30 0 0 0 204 251 Z" fill="#ffffff" opacity="0.25"/>
+                          <rect x="192" y="258" width="96" height="7" fill="#32363b"/>
+                      </g>
+                      <!-- bottom half (drops slightly) -->
+                      <g>
+                          <animateTransform attributeName="transform" type="translate" values="0 0;0 0;0 16;0 16;0 0" keyTimes="0;0.30;0.36;0.92;1" dur="8s" repeatCount="indefinite"/>
+                          <path d="M 192 264 A 48 48 0 0 0 288 264 Z" fill="#ffffff" stroke="#e4e2e2" stroke-width="1"/>
+                          <rect x="192" y="264" width="96" height="7" fill="#32363b"/>
+                          <circle cx="240" cy="264" r="13" fill="#32363b"/>
+                          <circle cx="240" cy="264" r="9" fill="#ffffff" stroke="#32363b" stroke-width="2"/>
+                      </g>
+                  </g>
+                  </svg>
+                  EOF
+                  } > profile/pokedex.svg
+
             - name: Commit cards
               run: |
                   git config user.name "github-actions[bot]"
