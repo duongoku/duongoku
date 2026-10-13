@@ -25,11 +25,11 @@
     <text x="178" y="148" class="handle">@duongoku</text>
     <rect x="178" y="158" width="104" height="26" rx="13" fill="#2f80ed"/>
     <text x="230" y="176" text-anchor="middle" class="cp">CP ★ 66</text>
-    <text x="316" y="112" class="statlabel">REPOS</text>
+    <text x="290" y="112" class="statlabel">REPOS</text>
     <text x="392" y="112" text-anchor="end" class="statval">68</text>
-    <text x="316" y="140" class="statlabel">FOLLOWERS</text>
+    <text x="290" y="140" class="statlabel">FOLLOWERS</text>
     <text x="392" y="140" text-anchor="end" class="statval">33</text>
-    <text x="316" y="168" class="statlabel">FORKS</text>
+    <text x="290" y="168" class="statlabel">FORKS</text>
     <text x="392" y="168" text-anchor="end" class="statval">7</text>
 </g>
 
