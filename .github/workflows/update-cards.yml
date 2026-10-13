@@ -18,7 +18,7 @@ jobs:
         steps:
             - uses: actions/checkout@v6
 
-            - name: Generate stats card
+            - name: Generate cards
               env:
                   GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
                   OWNER: ${{ github.repository_owner }}
@@ -45,54 +45,7 @@ jobs:
 
                   total_bytes=$(awk '{ s += $1 } END { print s }' /tmp/langs.txt)
 
-                  # --- Stats card ---
-                  {
-                      cat <<'EOF'
-                  <svg width="480" height="195" viewBox="0 0 480 195" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <style>
-                  .title { font: 600 18px 'Segoe UI', Ubuntu, Sans-Serif; fill: #2f80ed }
-                  .stat { font: 600 14px 'Segoe UI', Ubuntu, Sans-Serif; fill: #434d58 }
-                  </style>
-                  <rect x="0.5" y="0.5" width="479" height="194" rx="4.5" fill="#fffefe" stroke="#e4e2e2"/>
-                  <text x="25" y="35" class="title">GitHub Stats</text>
-                  EOF
-                      y=70
-                      for pair in "Public Repos: $total_repos" "Total Stars: $stars" "Total Forks: $forks" "Followers: $followers"; do
-                          label=${pair%%: *}
-                          value=${pair#*: }
-                          printf '  <text x="25" y="%d" class="stat">%s: %s</text>\n' "$y" "$label" "$value"
-                          y=$((y + 30))
-                      done
-                      echo '</svg>'
-                  } > profile/stats.svg
-
-                  # --- Top languages card ---
-                  {
-                      cat <<'EOF'
-                  <svg width="480" height="320" viewBox="0 0 480 320" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <style>
-                  .title { font: 600 18px 'Segoe UI', Ubuntu, Sans-Serif; fill: #2f80ed }
-                  .lang { font: 600 12px 'Segoe UI', Ubuntu, Sans-Serif; fill: #434d58 }
-                  .pct { font: 600 12px 'Segoe UI', Ubuntu, Sans-Serif; fill: #858585 }
-                  </style>
-                  <rect x="0.5" y="0.5" width="479" height="319" rx="4.5" fill="#fffefe" stroke="#e4e2e2"/>
-                  <text x="25" y="35" class="title">Top Languages</text>
-                  EOF
-                      y=70
-                      head -n 6 /tmp/langs.txt | while read -r bytes lang; do
-                          [ -n "$lang" ] || continue
-                          pct=$(awk -v b="$bytes" -v t="$total_bytes" 'BEGIN { printf "%.1f", (t > 0 ? 100 * b / t : 0) }')
-                          w=$(awk -v p="$pct" 'BEGIN { printf "%d", 430 * p / 100 }')
-                          printf '  <text x="25" y="%d" class="lang">%s</text>\n' "$y" "$lang"
-                          printf '  <rect x="25" y="%d" width="430" height="8" rx="4" fill="#e4e2e2"/>\n' "$((y + 8))"
-                          printf '  <rect x="25" y="%d" width="%d" height="8" rx="4" fill="#2f80ed"/>\n' "$((y + 8))" "$w"
-                          printf '  <text x="455" y="%d" text-anchor="end" class="pct">%s%%</text>\n' "$y" "$pct"
-                          y=$((y + 40))
-                      done
-                      echo '</svg>'
-                  } > profile/top-langs.svg
-
-                  # --- Pokédex card ---
+                  # --- Pokédex card (single card: trainer + GitHub stats + top languages) ---
                   # Avatar: embed as base64 data URI (GitHub README <img> blocks external refs).
                   AVATAR_LINE=''
                   if curl -sL --fail "https://github.com/$OWNER.png?size=96" -o /tmp/avatar.png && [ -s /tmp/avatar.png ]; then
@@ -106,7 +59,7 @@ jobs:
 
                   {
                       cat <<EOF
-                  <svg width="480" height="360" viewBox="0 0 480 360" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <svg width="480" height="600" viewBox="0 0 480 600" fill="none" xmlns="http://www.w3.org/2000/svg">
                   <style>
                   .title { font: 600 18px 'Segoe UI', Ubuntu, Sans-Serif; fill: #2f80ed }
                   .name { font: 600 22px 'Segoe UI', Ubuntu, Sans-Serif; fill: #434d58 }
@@ -114,12 +67,16 @@ jobs:
                   .cp { font: 700 14px 'Segoe UI', Ubuntu, Sans-Serif; fill: #ffffff }
                   .statlabel { font: 600 11px 'Segoe UI', Ubuntu, Sans-Serif; fill: #858585; letter-spacing: 1px }
                   .statval { font: 700 16px 'Segoe UI', Ubuntu, Sans-Serif; fill: #434d58 }
+                  .statlabel2 { font: 600 12px 'Segoe UI', Ubuntu, Sans-Serif; fill: #858585; letter-spacing: 1px }
+                  .statval2 { font: 700 14px 'Segoe UI', Ubuntu, Sans-Serif; fill: #434d58 }
+                  .lang { font: 600 12px 'Segoe UI', Ubuntu, Sans-Serif; fill: #434d58 }
+                  .pct { font: 600 12px 'Segoe UI', Ubuntu, Sans-Serif; fill: #858585 }
                   .fallback-initial { font: 700 30px 'Segoe UI', Ubuntu, Sans-Serif; fill: #ffffff }
                   </style>
                   <defs>
                   <clipPath id="avclip"><circle cx="122" cy="140" r="34"/></clipPath>
                   </defs>
-                  <rect x="0.5" y="0.5" width="479" height="359" rx="4.5" fill="#fffefe" stroke="#e4e2e2"/>
+                  <rect x="0.5" y="0.5" width="479" height="599" rx="4.5" fill="#fffefe" stroke="#e4e2e2"/>
                   <text x="25" y="35" class="title">Pokédex</text>
 
                   <!-- Trainer card (slides up out of the ball) -->
@@ -128,7 +85,7 @@ jobs:
                       <animateTransform attributeName="transform" type="translate" values="0 140;0 140;0 -8;0 0;0 0;0 140" keyTimes="0;0.36;0.46;0.5;0.88;0.95" dur="8s" repeatCount="indefinite"/>
                       <rect x="70.5" y="70.5" width="335" height="139" rx="11" fill="#ffffff" stroke="#e4e2e2"/>
                       <circle cx="122" cy="140" r="38" fill="#ffffff" stroke="#e4e2e2" stroke-width="2"/>
-                      $AVATAR_LINE
+                  $AVATAR_LINE
                       <text x="178" y="126" class="name">Duong</text>
                       <text x="178" y="148" class="handle">@duongoku</text>
                       <rect x="178" y="158" width="104" height="26" rx="13" fill="#2f80ed"/>
@@ -167,8 +124,8 @@ jobs:
                       <!-- top half (flips open on hinge at left edge) -->
                       <g>
                           <animateTransform attributeName="transform" type="rotate" values="0 192 264;0 192 264;-135 192 264;-135 192 264;0 192 264" keyTimes="0;0.30;0.36;0.92;1" dur="8s" repeatCount="indefinite"/>
-                          <path d="M 192 264 A 48 48 0 0 1 288 264 Z" fill="#ee4035"/>
-                          <path d="M 196 236 A 48 48 0 0 1 284 236 L 276 251 A 30 30 0 0 0 204 251 Z" fill="#ffffff" opacity="0.25"/>
+                          <path d="M 192 264 A 48 48 0 0 1 288 264 Z" fill="#ffffff" stroke="#e4e2e2" stroke-width="1"/>
+                          <path d="M 196 236 A 48 48 0 0 1 284 236 L 276 251 A 30 30 0 0 0 204 251 Z" fill="#434d58" opacity="0.06"/>
                           <rect x="192" y="258" width="96" height="7" fill="#32363b"/>
                       </g>
                       <!-- bottom half (drops slightly) -->
@@ -176,17 +133,43 @@ jobs:
                           <animateTransform attributeName="transform" type="translate" values="0 0;0 0;0 16;0 16;0 0" keyTimes="0;0.30;0.36;0.92;1" dur="8s" repeatCount="indefinite"/>
                           <path d="M 192 264 A 48 48 0 0 0 288 264 Z" fill="#ffffff" stroke="#e4e2e2" stroke-width="1"/>
                           <rect x="192" y="264" width="96" height="7" fill="#32363b"/>
-                          <circle cx="240" cy="264" r="13" fill="#32363b"/>
-                          <circle cx="240" cy="264" r="9" fill="#ffffff" stroke="#32363b" stroke-width="2"/>
+                          <circle cx="240" cy="264" r="13" fill="#ee4035"/>
+                          <circle cx="240" cy="264" r="8" fill="#ffffff" stroke="#ee4035" stroke-width="3"/>
                       </g>
                   </g>
-                  </svg>
+
+                  <!-- GitHub Stats (static 2x2 grid) -->
+                  <text x="25" y="352" class="title">GitHub Stats</text>
                   EOF
+                      printf '%s\n' \
+                          "Public Repos|$total_repos|25|230|376" \
+                          "Total Stars|$stars|250|455|376" \
+                          "Total Forks|$forks|25|230|396" \
+                          "Followers|$followers|250|455|396" \
+                          | while IFS='|' read -r label value lx vx y; do
+                              printf '  <text x="%s" y="%s" class="statlabel2">%s</text>\n' "$lx" "$y" "$label"
+                              printf '  <text x="%s" y="%s" text-anchor="end" class="statval2">%s</text>\n' "$vx" "$y" "$value"
+                          done
+
+                      # Top Languages (static rows, up to 5)
+                      printf '  <text x="25" y="428" class="title">Top Languages</text>\n'
+                      y=452
+                      head -n 5 /tmp/langs.txt | while read -r bytes lang; do
+                          [ -n "$lang" ] || continue
+                          pct=$(awk -v b="$bytes" -v t="$total_bytes" 'BEGIN { printf "%.1f", (t > 0 ? 100 * b / t : 0) }')
+                          w=$(awk -v p="$pct" 'BEGIN { printf "%d", 430 * p / 100 }')
+                          printf '  <text x="25" y="%d" class="lang">%s</text>\n' "$y" "$lang"
+                          printf '  <rect x="25" y="%d" width="430" height="8" rx="4" fill="#e4e2e2"/>\n' "$((y + 8))"
+                          printf '  <rect x="25" y="%d" width="%d" height="8" rx="4" fill="#2f80ed"/>\n' "$((y + 8))" "$w"
+                          printf '  <text x="455" y="%d" text-anchor="end" class="pct">%s%%</text>\n' "$y" "$pct"
+                          y=$((y + 30))
+                      done
+                      echo '</svg>'
                   } > profile/pokedex.svg
 
             - name: Commit cards
               run: |
                   git config user.name "github-actions[bot]"
                   git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-                  git add profile/*.svg
+                  git add -A profile
                   git diff --cached --quiet || (git commit -m "Update README cards" && git push)
