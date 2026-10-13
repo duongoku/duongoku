@@ -92,20 +92,20 @@
   <rect x="25" y="460" width="430" height="8" rx="4" fill="#e4e2e2"/>
   <rect x="25" y="460" width="128" height="8" rx="4" fill="#2f80ed"/>
   <text x="455" y="452" text-anchor="end" class="pct">29.8%</text>
-  <text x="25" y="482" class="lang">Shell</text>
+  <text x="25" y="482" class="lang">Python</text>
   <rect x="25" y="490" width="430" height="8" rx="4" fill="#e4e2e2"/>
-  <rect x="25" y="490" width="89" height="8" rx="4" fill="#2f80ed"/>
-  <text x="455" y="482" text-anchor="end" class="pct">20.9%</text>
-  <text x="25" y="512" class="lang">Python</text>
+  <rect x="25" y="490" width="66" height="8" rx="4" fill="#2f80ed"/>
+  <text x="455" y="482" text-anchor="end" class="pct">15.5%</text>
+  <text x="25" y="512" class="lang">JavaScript</text>
   <rect x="25" y="520" width="430" height="8" rx="4" fill="#e4e2e2"/>
-  <rect x="25" y="520" width="66" height="8" rx="4" fill="#2f80ed"/>
-  <text x="455" y="512" text-anchor="end" class="pct">15.5%</text>
-  <text x="25" y="542" class="lang">JavaScript</text>
+  <rect x="25" y="520" width="62" height="8" rx="4" fill="#2f80ed"/>
+  <text x="455" y="512" text-anchor="end" class="pct">14.5%</text>
+  <text x="25" y="542" class="lang">TypeScript</text>
   <rect x="25" y="550" width="430" height="8" rx="4" fill="#e4e2e2"/>
-  <rect x="25" y="550" width="62" height="8" rx="4" fill="#2f80ed"/>
-  <text x="455" y="542" text-anchor="end" class="pct">14.5%</text>
-  <text x="25" y="572" class="lang">TypeScript</text>
+  <rect x="25" y="550" width="54" height="8" rx="4" fill="#2f80ed"/>
+  <text x="455" y="542" text-anchor="end" class="pct">12.7%</text>
+  <text x="25" y="572" class="lang">Dart</text>
   <rect x="25" y="580" width="430" height="8" rx="4" fill="#e4e2e2"/>
-  <rect x="25" y="580" width="54" height="8" rx="4" fill="#2f80ed"/>
-  <text x="455" y="572" text-anchor="end" class="pct">12.7%</text>
+  <rect x="25" y="580" width="28" height="8" rx="4" fill="#2f80ed"/>
+  <text x="455" y="572" text-anchor="end" class="pct">6.6%</text>
 </svg>
